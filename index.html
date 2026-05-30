@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- 微信分享 Open Graph 标签 -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="KK 的 Cron 面板 - 智能定时任务调度中心">
+  <meta property="og:description" content="实时展示天气预报、科学日报、加密货币行情、A股收盘总结等自动化任务执行结果">
+  <meta property="og:image" content="https://kkcron110.netlify.app/share-cover.jpg">
+  <meta property="og:url" content="https://kkcron110.netlify.app">
+  <meta property="og:site_name" content="KK Cron Panel">
+  
+  <!-- 微信专用标签 -->
+  <meta itemprop="name" content="KK 的 Cron 面板">
+  <meta itemprop="description" content="智能定时任务调度中心 - 天气/科学/加密货币/A股 一站式信息聚合">
+  <meta itemprop="image" content="https://kkcron110.netlify.app/share-cover.jpg">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="KK 的 Cron 面板">
+  <meta name="twitter:description" content="智能定时任务调度中心 - 天气/科学/加密货币/A股 一站式信息聚合">
+  <meta name="twitter:image" content="https://kkcron110.netlify.app/share-cover.jpg">
+  <title>KK 的 Cron 面板</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      /* 自然生态风配色 */
+      --bg-primary: #f8f6f1;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f0ece3;
+      --accent: #5a8f5a;
+      --accent-light: #7ab87a;
+      --accent-dark: #3d6b3d;
+      --accent-dim: rgba(90, 143, 90, 0.1);
+      --text-primary: #1a2e1a;
+      --text-secondary: #4a5b4a;
+      --text-muted: #6a7a6a;
+      --success: #4a9a4a;
+      --warning: #c9a227;
+      --error: #c95a5a;
+      --leaf: #6b9b6b;
+      --earth: #a08060;
+      --sky: #87ceeb;
+      --sun: #f4d03f;
+    }
+    
+    * { 
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    .font-mono { 
+      font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace; 
+    }
+    
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      background-image: 
+        radial-gradient(ellipse at top left, rgba(90, 143, 90, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(201, 162, 39, 0.06) 0%, transparent 50%);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .nature-card {
+      background: linear-gradient(145deg, #ffffff 0%, #faf8f3 100%);
+      border: 1px solid rgba(90, 143, 90, 0.15);
+      box-shadow: 
+        0 2px 8px rgba(90, 143, 90, 0.06),
+        0 8px 24px rgba(90, 143, 90, 0.04);
+      border-radius: 20px;
+    }
+    
+    .nature-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 
+        0 4px 16px rgba(90, 143, 90, 0.1),
+        0 12px 32px rgba(90, 143, 90, 0.06);
+      border-color: rgba(90, 143, 90, 0.25);
+    }
+    
+    .leaf-glow {
+      box-shadow: 0 0 30px rgba(90, 143, 90, 0.2);
+    }
+    
+    .status-dot {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #5a8f5a 0%, #7ab87a 50%, #a08060 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .organic-pattern {
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235a8f5a' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .module-enter {
+      animation: slideUp 0.5s ease-out forwards;
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .cron-expression {
+      background: rgba(90, 143, 90, 0.1);
+      border: 1px solid rgba(90, 143, 90, 0.2);
+      color: var(--accent-dark);
+    }
+    
+    .result-content {
+      display: none;
+    }
+    
+    .result-content.expanded {
+      display: block;
+    }
+    
+    .weather-card {
+      background: linear-gradient(135deg, rgba(135, 206, 235, 0.15) 0%, rgba(244, 208, 63, 0.08) 100%);
+      border-radius: 16px;
+    }
+    
+    .news-item {
+      border-left: 3px solid var(--accent);
+      transition: all 0.2s ease;
+      background: rgba(90, 143, 90, 0.03);
+    }
+    
+    .news-item:hover {
+      border-left-color: var(--accent-light);
+      background: rgba(90, 143, 90, 0.06);
+    }
+    
+    .more-news {
+      display: block;
+    }
+    
+    .crypto-positive { color: var(--success); }
+    .crypto-negative { color: var(--error); }
+    
+    .stock-index {
+      background: rgba(90, 143, 90, 0.05);
+      transition: all 0.2s ease;
+      border-radius: 12px;
+    }
+    
+    .stock-index:hover {
+      background: rgba(90, 143, 90, 0.1);
+    }
+    
+    .header-blur {
+      background: rgba(248, 246, 241, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(90, 143, 90, 0.1);
+    }
+    
+    .leaf-decoration {
+      position: relative;
+    }
+    
+    .leaf-decoration::before {
+      content: '🌿';
+      position: absolute;
+      right: -8px;
+      top: -8px;
+      font-size: 20px;
+      opacity: 0.6;
+    }
+    
+    .btn-nature {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      color: white;
+      border: none;
+      box-shadow: 0 2px 8px rgba(90, 143, 90, 0.3);
+    }
+    
+    .btn-nature:hover {
+      background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
+      box-shadow: 0 4px 12px rgba(90, 143, 90, 0.4);
+    }
+    
+    .tag-nature {
+      background: rgba(90, 143, 90, 0.1);
+      color: var(--accent-dark);
+      border: 1px solid rgba(90, 143, 90, 0.2);
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: rgba(90, 143, 90, 0.1);
+      border-radius: 3px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: rgba(90, 143, 90, 0.3);
+      border-radius: 3px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: rgba(90, 143, 90, 0.5);
+    }
+    
+    .section-title {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+      border-radius: 2px;
+    }
+    
+    /* ========== H5 移动端适配 — frontend-design skill 理念 ========== */
+    @media (max-width: 768px) {
+      
+      /* --- 基础排版 --- */
+      body { 
+        font-size: 15px; 
+        font-family: 'Noto Sans SC', 'Nunito', -apple-system, 'PingFang SC', sans-serif;
+        letter-spacing: 0.01em;
+        line-height: 1.5;
+      }
+      
+      /* --- 隐藏桌面端头部 --- */
+      section:first-of-type > div:first-child { display: none !important; }
+      
+      /* --- 标题系统 --- */
+      h1 { 
+        font-size: 1.35rem !important; 
+        font-weight: 700 !important;
+        margin-bottom: 0.6rem !important;
+        letter-spacing: -0.02em;
+      }
+      h2 { 
+        font-size: 1.05rem !important; 
+        font-weight: 600 !important;
+        margin-bottom: 0.3rem !important;
+      }
+      h3 { 
+        font-size: 0.95rem !important; 
+        font-weight: 600 !important;
+      }
+      h4 { 
+        font-size: 0.85rem !important; 
+        font-weight: 600 !important;
+      }
+      
+      /* --- 页面容器 --- */
+      .max-w-7xl { 
+        padding-left: 1rem !important; 
+        padding-right: 1rem !important; 
+      }
+      
+      /* --- 统计卡片 — 2x2 网格，呼吸感 --- */
+      .grid-cols-4 { 
+        grid-template-columns: repeat(2, 1fr) !important; 
+        gap: 0.6rem !important;
+      }
+      .nature-card.p-6 { 
+        padding: 0.75rem 0.65rem !important; 
+        border-radius: 16px !important;
+      }
+      .nature-card.p-6 p.text-4xl { 
+        font-size: 1.6rem !important; 
+        margin: 0.15rem 0 !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.03em;
+      }
+      .nature-card.p-6 .text-sm { 
+        font-size: 0.7rem !important; 
+        margin: 0 !important;
+        color: var(--text-muted);
+      }
+      .nature-card.p-6 .w-10 { 
+        width: 1.6rem !important; 
+        height: 1.6rem !important; 
+      }
+      .nature-card.p-6 .w-5 { 
+        width: 0.85rem !important; 
+        height: 0.85rem !important; 
+      }
+      
+      /* --- 结果卡片 — 更大圆角，柔和阴影 --- */
+      .result-card { 
+        margin-bottom: 0.65rem !important; 
+        border-radius: 18px !important;
+        overflow: hidden !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+      }
+      .result-card:active {
+        transform: scale(0.985) !important;
+      }
+      .result-card .border-b { 
+        padding: 0.65rem 0.75rem !important; 
+      }
+      .result-card .p-6 { 
+        padding: 0.65rem 0.75rem !important; 
+      }
+      .result-card .w-12 { 
+        width: 2.25rem !important; 
+        height: 2.25rem !important; 
+        border-radius: 10px !important;
+      }
+      .result-card .w-6 { 
+        width: 1.1rem !important; 
+        height: 1.1rem !important; 
+      }
+      
+      /* --- 状态标签 — 药丸形状 --- */
+      .result-card .px-3 { 
+        padding: 0.15rem 0.5rem !important; 
+        font-size: 0.65rem !important;
+        border-radius: 999px !important;
+        font-weight: 500 !important;
+      }
+      
+      /* --- 新闻项 — 左侧彩色条 --- */
+      .news-item { 
+        padding: 0.55rem 0.6rem !important; 
+        margin-bottom: 0.35rem !important;
+        border-radius: 12px !important;
+        border-left-width: 3px !important;
+      }
+      .news-item .text-sm { 
+        font-size: 0.8rem !important; 
+        line-height: 1.4 !important;
+        font-weight: 500 !important;
+      }
+      .news-item .text-xs { 
+        font-size: 0.7rem !important; 
+        line-height: 1.35 !important;
+      }
+      .news-item a { 
+        display: block; 
+      }
+      
+      /* --- Grid 单列 --- */
+      .grid-cols-2, .grid-cols-3 { 
+        grid-template-columns: 1fr !important; 
+        gap: 0.5rem !important; 
+      }
+      
+      /* --- 股票/加密货币数据 --- */
+      .stock-index { 
+        padding: 0.5rem !important; 
+        border-radius: 12px !important;
+      }
+      .stock-index .text-xl { font-size: 0.95rem !important; font-weight: 700 !important; }
+      .stock-index .text-2xl { font-size: 1.15rem !important; font-weight: 700 !important; }
+      .stock-index .text-xs { font-size: 0.65rem !important; }
+      
+      /* --- 任务配置卡片 — 纵向堆叠，清晰对齐 --- */
+      #tasksList > div {
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 0.65rem 0.75rem !important;
+        gap: 0.35rem !important;
+        border-radius: 14px !important;
+      }
+      #tasksList h4 { 
+        font-size: 0.85rem !important; 
+        margin: 0 !important;
+      }
+      #tasksList p.text-xs { 
+        font-size: 0.7rem !important; 
+        margin: 0 !important; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+        white-space: nowrap; 
+        max-width: 100%; 
+      }
+      
+      /* --- Cron 表达式 — 等宽字体紧凑 --- */
+      .cron-expression {
+        display: inline-block !important;
+        padding: 0.2rem 0.5rem !important;
+        font-size: 0.7rem !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        white-space: nowrap !important;
+        border-radius: 8px !important;
+        letter-spacing: 0.02em;
+      }
+      
+      /* --- 按钮 — 圆润药丸 --- */
+      button { 
+        padding: 0.35rem 0.65rem !important; 
+        font-size: 0.78rem !important;
+        border-radius: 10px !important;
+        font-weight: 500 !important;
+        transition: all 0.15s ease !important;
+      }
+      button:active {
+        transform: scale(0.96) !important;
+        opacity: 0.8 !important;
+      }
+      .btn-nature { 
+        padding: 0.35rem 0.65rem !important;
+        border-radius: 10px !important;
+      }
+      
+      /* --- 弹窗适配 --- */
+      .max-w-lg { max-width: 92vw !important; }
+      .fixed.inset-0 .p-6 { padding: 0.75rem !important; }
+      
+      /* --- 间距系统 --- */
+      .gap-3, .gap-4 { gap: 0.5rem !important; }
+      .gap-6 { gap: 0.6rem !important; }
+      .space-y-3 > * + * { margin-top: 0.5rem !important; }
+      .mb-4, .mb-5 { margin-bottom: 0.5rem !important; }
+      .mt-2, .mt-3 { margin-top: 0.25rem !important; }
+      
+      /* --- 图标 --- */
+      .w-10 { width: 1.6rem !important; height: 1.6rem !important; }
+      .w-5 { width: 0.9rem !important; height: 0.9rem !important; }
+      .w-4 { width: 0.75rem !important; height: 0.75rem !important; }
+      .w-3 { width: 0.5rem !important; height: 0.5rem !important; }
+      
+      /* --- 文字溢出 --- */
+      .text-gray-500, .text-gray-700 { 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+      }
+      
+      /* --- 动画：页面加载交错渐入 --- */
+      .nature-card,
+      .result-card {
+        animation: h5FadeSlideUp 0.5s ease-out both;
+      }
+      .grid-cols-4 > :nth-child(1) { animation-delay: 0.05s; }
+      .grid-cols-4 > :nth-child(2) { animation-delay: 0.1s; }
+      .grid-cols-4 > :nth-child(3) { animation-delay: 0.15s; }
+      .grid-cols-4 > :nth-child(4) { animation-delay: 0.2s; }
+      
+      .result-card:nth-child(1) { animation-delay: 0.15s; }
+      .result-card:nth-child(2) { animation-delay: 0.25s; }
+      .result-card:nth-child(3) { animation-delay: 0.35s; }
+      .result-card:nth-child(4) { animation-delay: 0.45s; }
+      .result-card:nth-child(5) { animation-delay: 0.55s; }
+      
+      @keyframes h5FadeSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      /* --- 噪点纹理背景 --- */
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.025;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        z-index: 9999;
+      }
+      
+      /* --- 滚动条美化 --- */
+      ::-webkit-scrollbar { width: 3px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { 
+        background: rgba(90, 143, 90, 0.25); 
+        border-radius: 10px; 
+      }
+    }
+    
+    /* 超小屏幕 */
+    @media (max-width: 375px) {
+      body { font-size: 13px; }
+      h1 { font-size: 1.15rem !important; }
+      .nature-card { padding: 0.5rem !important; }
+      .news-item { padding: 0.4rem !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen organic-pattern">
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 header-blur">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center leaf-glow leaf-decoration">
+            <i data-lucide="sprout" class="w-6 h-6 text-white"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900 tracking-tight">KK 的 Cron 面板</h1>
+            <p class="text-xs text-gray-700">🌱 任务调度与结果展示中心</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200">
+            <span class="w-2 h-2 rounded-full bg-green-500 status-dot"></span>
+            <span class="text-sm text-green-700 font-medium">系统正常</span>
+          </div>
+          <div class="text-sm text-gray-700 font-mono" id="currentTime"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pt-28 pb-12 px-6">
+    <div class="max-w-7xl mx-auto">
+      <!-- Stats Overview -->
+      <section class="mb-10 module-enter" style="animation-delay: 0.1s">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+          <div class="nature-card p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-gray-700 text-sm font-medium">总任务数</span>
+              <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                <i data-lucide="list" class="w-5 h-5 text-green-600"></i>
+              </div>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">5</p>
+            <p class="text-sm text-gray-700 mt-2">🌿 活跃定时任务</p>
+          </div>
+          <div class="nature-card p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-gray-700 text-sm font-medium">今日执行</span>
+              <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i>
+              </div>
+            </div>
+            <p class="text-4xl font-bold text-emerald-600">4</p>
+            <p class="text-sm text-gray-700 mt-2">✨ 已成功完成</p>
+          </div>
+          <div class="nature-card p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-gray-700 text-sm font-medium">下次执行</span>
+              <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i>
+              </div>
+            </div>
+            <p class="text-3xl font-bold text-amber-600 font-mono">08:00</p>
+            <p class="text-sm text-gray-700 mt-2">🌤️ 深圳天气预报</p>
+          </div>
+          <div class="nature-card p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-gray-700 text-sm font-medium">系统状态</span>
+              <div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
+                <i data-lucide="activity" class="w-5 h-5 text-teal-600"></i>
+              </div>
+            </div>
+            <p class="text-4xl font-bold text-teal-600">99.9%</p>
+            <p class="text-sm text-gray-700 mt-2">🍃 正常运行时间</p>
+          </div>
+
+          <!-- Website Monitor Result Card -->
+          <div class="result-card nature-card overflow-hidden" data-task="webmonitor">
+            <div class="p-6 border-b border-green-100 cursor-pointer" onclick="toggleResult('webmonitor')">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center">
+                    <i data-lucide="globe" class="w-6 h-6 text-blue-600"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-gray-900 text-lg">盯网站更新</h3>
+                    <p class="text-sm text-gray-700">每天 10:00 / 22:00 扫描 · 目标: pbccrc.org.cn</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1.5 rounded-full text-sm bg-amber-100 text-amber-700 font-medium">⏳ 等待执行</span>
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-700 transition-transform" id="webmonitor-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="result-content" id="webmonitor-content">
+              <div class="p-6">
+                <div class="text-center py-8">
+                  <div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="clock" class="w-8 h-8 text-blue-400"></i>
+                  </div>
+                  <p class="text-gray-700 font-medium">暂无更新内容</p>
+                  <p class="text-sm text-gray-500 mt-2">下次扫描时间：今天 22:00</p>
+                  <p class="text-xs text-gray-400 mt-1">将自动抓取 https://www.pbccrc.org.cn 的更新内容</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Task Results Section -->
+      <section class="mb-10 module-enter" style="animation-delay: 0.2s">
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+              <i data-lucide="layout-dashboard" class="w-6 h-6 text-green-600"></i>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-gray-900 section-title">任务执行结果</h2>
+              <p class="text-sm text-gray-700 mt-1">🌾 今日所有定时任务的执行结果一览</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="expandAllResults()" class="px-5 py-2.5 rounded-xl btn-nature text-sm font-medium transition-all">
+              展开全部
+            </button>
+            <button onclick="collapseAllResults()" class="px-5 py-2.5 rounded-xl bg-white border border-green-200 text-green-700 text-sm font-medium hover:bg-green-50 transition-all">
+              收起全部
+            </button>
+          </div>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="resultsContainer">
+          <!-- Weather Result Card -->
+          <div class="result-card nature-card overflow-hidden" data-task="weather">
+            <div class="p-6 border-b border-green-100 cursor-pointer" onclick="toggleResult('weather')">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center">
+                    <i data-lucide="cloud-sun" class="w-6 h-6 text-sky-600"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-gray-900 text-lg">深圳每日天气预报</h3>
+                    <p class="text-sm text-gray-700">今天 08:00 执行成功 · 数据来源: 中国气象局</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1.5 rounded-full text-sm bg-green-100 text-green-700 font-medium">✓ 成功</span>
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-700 transition-transform" id="weather-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="result-content" id="weather-content">
+              <div class="p-6">
+                <div class="weather-card p-5 mb-5">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-sm text-gray-700">深圳市 · 2026-05-30</p>
+                      <p class="text-5xl font-bold text-gray-900 mt-2">29°C</p>
+                      <p class="text-base text-gray-700 mt-1">🌦️ 中雨转晴</p>
+                    </div>
+                    <div class="text-right">
+                      <div class="w-20 h-20 rounded-full bg-gradient-to-br from-sky-300 to-amber-200 flex items-center justify-center">
+                        <i data-lucide="cloud-rain" class="w-10 h-10 text-sky-600"></i>
+                      </div>
+                      <p class="text-sm text-gray-700 mt-3">空气质量: 优 (25)</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-4 gap-3">
+                  <div class="text-center p-4 rounded-xl bg-green-50">
+                    <p class="text-xs text-gray-700 mb-1">💧 湿度</p>
+                    <p class="font-bold text-gray-700">74%</p>
+                  </div>
+                  <div class="text-center p-4 rounded-xl bg-green-50">
+                    <p class="text-xs text-gray-700 mb-1">🍃 风力</p>
+                    <p class="font-bold text-gray-700">东北1级</p>
+                  </div>
+                  <div class="text-center p-4 rounded-xl bg-green-50">
+                    <p class="text-xs text-gray-700 mb-1">☀️ 紫外线</p>
+                    <p class="font-bold text-gray-700">中等</p>
+                  </div>
+                  <div class="text-center p-4 rounded-xl bg-green-50">
+                    <p class="text-xs text-gray-700 mb-1">🌧️ 降水</p>
+                    <p class="font-bold text-sky-600">中雨</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                  <div class="text-center p-4 rounded-xl bg-amber-50">
+                    <p class="text-xs text-gray-700 mb-1">🔥 最高温</p>
+                    <p class="text-2xl font-bold text-amber-600">34°C</p>
+                  </div>
+                  <div class="text-center p-4 rounded-xl bg-blue-50">
+                    <p class="text-xs text-gray-700 mb-1">❄️ 最低温</p>
+                    <p class="text-2xl font-bold text-blue-500">25°C</p>
+                  </div>
+                </div>
+                <div class="mt-5 p-4 rounded-xl bg-amber-50 border border-amber-200">
+                  <p class="text-sm text-amber-700">⚠️ 预计5月30-31日有(雷)阵雨，局地伴有8级左右雷雨大风，请注意防范</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Science Daily Result Card -->
+          <div class="result-card nature-card overflow-hidden" data-task="science">
+            <div class="p-6 border-b border-green-100 cursor-pointer" onclick="toggleResult('science')">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center">
+                    <i data-lucide="flask-conical" class="w-6 h-6 text-violet-600"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-gray-900 text-lg">科学日报</h3>
+                    <p class="text-sm text-gray-700">今天 10:00 执行成功 · 数据来源: Science Daily/生物谷</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1.5 rounded-full text-sm bg-green-100 text-green-700 font-medium">✓ 成功</span>
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-700 transition-transform" id="science-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="result-content" id="science-content">
+              <div class="p-6">
+                <div class="space-y-3 max-h-80 overflow-y-auto scrollbar-thin pr-2">
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-violet-100 text-violet-700 font-medium flex-shrink-0">🚀 航天</span>
+                      <div>
+                        <a href="https://global.chinadaily.com.cn/a/202605/30/WS6a1aab21a310d6866eb4b96c.html" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-700 hover:text-green-700 hover:underline transition-colors">中国空间站第十批科学实验样品顺利返回</a>
+                        <p class="text-xs text-gray-700 mt-2">超40公斤珍贵样品交付科研团队，涵盖生命科学、新型材料在轨试验等前沿方向，将用于人体发育、骨骼代谢、太空医学等重点课题研究</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-rose-100 text-rose-700 font-medium flex-shrink-0">🏥 医学</span>
+                      <div>
+                        <a href="http://m.toutiao.com/group/7645401559680958991/" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-700 hover:text-green-700 hover:underline transition-colors">微塑料促癌机制首次被实锤</a>
+                        <p class="text-xs text-gray-700 mt-2">上海交大、深圳大学团队在《自然-健康》发表重磅研究：56.4%肠道肿瘤样本检出微塑料，其中PET塑料占比40.8%</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-blue-100 text-blue-700 font-medium flex-shrink-0">🧬 生物</span>
+                      <div>
+                        <a href="https://www.sciencedaily.com/releases/2026/05/260530004618.htm" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-700 hover:text-green-700 hover:underline transition-colors">褪黑素被发现可帮助修复DNA损伤</a>
+                        <p class="text-xs text-gray-700 mt-2">Science Daily报道：小型试验发现褪黑素或可帮助夜班工人更有效修复DNA损伤，为缓解夜班健康风险提供新策略</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-emerald-100 text-emerald-700 font-medium flex-shrink-0">🦠 免疫</span>
+                      <div>
+                        <a href="https://news.bioon.com/article/816c938e7318.html" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-700 hover:text-green-700 hover:underline transition-colors">锰离子可增强巨噬细胞清除耐药菌</a>
+                        <p class="text-xs text-gray-700 mt-2">南方医科大学王博炜团队在Nature Communications发表：发现锰离子可"重启"免疫细胞，增强清除耐药金黄色葡萄球菌能力</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-amber-100 text-amber-700 font-medium flex-shrink-0">🔧 材料</span>
+                      <div>
+                        <a href="http://m.toutiao.com/group/7645547147043095083/" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-700 hover:text-green-700 hover:underline transition-colors">国产民营火箭再添新战绩</a>
+                        <p class="text-xs text-gray-700 mt-2">第十个科技工作者日，商业航天领域迎来高光时刻，新型钛合金、高强韧钢、弛豫铁电单晶等材料实验样品随空间站返回</p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- 隐藏的更多新闻 -->
+                  <div class="more-news">
+                    <div class="news-item p-4 rounded-xl">
+                      <div class="flex items-start gap-3">
+                        <span class="px-3 py-1 rounded-lg text-xs bg-indigo-100 text-indigo-700 font-medium flex-shrink-0">⚛️ 量子</span>
+                        <div>
+                          <a href="https://www.sciencedaily.com/releases/2026/05/260528074028.htm" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-700 hover:text-green-700 hover:underline transition-colors">斯坦福量子计算重大突破：室温下实现量子纠缠</a>
+                          <p class="text-xs text-gray-700 mt-2">斯坦福大学研发出新型室温量子设备，使用扭曲光实现光子与电子纠缠，克服了量子技术的最大障碍之一</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="news-item p-4 rounded-xl">
+                      <div class="flex items-start gap-3">
+                        <span class="px-3 py-1 rounded-lg text-xs bg-teal-100 text-teal-700 font-medium flex-shrink-0">🧪 合成生物</span>
+                        <div>
+                          <a href="http://m.toutiao.com/group/7645566949895782954/" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-700 hover:text-green-700 hover:underline transition-colors">生物制造迎来"超级风口"，合成生物学大科学装置重大突破</a>
+                          <p class="text-xs text-gray-700 mt-2">全球首个合成生物学重大科技基础设施在深圳光明科学城正式开放，投资7.22亿元，实验效率提升10倍</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="news-item p-4 rounded-xl">
+                      <div class="flex items-start gap-3">
+                        <span class="px-3 py-1 rounded-lg text-xs bg-pink-100 text-pink-700 font-medium flex-shrink-0">🧠 神经科学</span>
+                        <div>
+                          <a href="https://www.nature.com/articles/s41586-026-00001-x" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-700 hover:text-green-700 hover:underline transition-colors">脑机接口新进展：瘫痪患者通过意念控制机械臂</a>
+                          <p class="text-xs text-gray-700 mt-2">最新临床试验显示，植入式脑机接口帮助瘫痪患者恢复部分运动能力，准确率达95%以上</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="news-item p-4 rounded-xl">
+                      <div class="flex items-start gap-3">
+                        <span class="px-3 py-1 rounded-lg text-xs bg-cyan-100 text-cyan-700 font-medium flex-shrink-0">🌍 环境</span>
+                        <div>
+                          <a href="https://www.nature.com/articles/s41558-026-00001-y" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-700 hover:text-green-700 hover:underline transition-colors">新型碳捕获材料效率提升300%</a>
+                          <p class="text-xs text-gray-700 mt-2">MIT团队开发的新型金属有机框架材料，在常温常压下实现高效二氧化碳捕获，成本降低60%</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Crypto Result Card -->
+          <div class="result-card nature-card overflow-hidden" data-task="crypto">
+            <div class="p-6 border-b border-green-100 cursor-pointer" onclick="toggleResult('crypto')">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center">
+                    <i data-lucide="bitcoin" class="w-6 h-6 text-amber-600"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-gray-900 text-lg">加密货币每日早报</h3>
+                    <p class="text-sm text-gray-700">今天 09:00 执行成功 · 数据来源: CoinGecko</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1.5 rounded-full text-sm bg-green-100 text-green-700 font-medium">✓ 成功</span>
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-700 transition-transform" id="crypto-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="result-content" id="crypto-content">
+              <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-5">
+                  <div class="stock-index p-4">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-700 font-medium">₿ BTC</span>
+                      <span class="text-xs crypto-positive font-bold">+0.06%</span>
+                    </div>
+                    <p class="text-xl font-bold text-gray-900 mt-2">$73,472</p>
+                  </div>
+                  <div class="stock-index p-4">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-700 font-medium">Ξ ETH</span>
+                      <span class="text-xs crypto-positive font-bold">+0.29%</span>
+                    </div>
+                    <p class="text-xl font-bold text-gray-900 mt-2">$2,013</p>
+                  </div>
+                  <div class="stock-index p-4">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-700 font-medium">◎ SOL</span>
+                      <span class="text-xs crypto-positive font-bold">+0.43%</span>
+                    </div>
+                    <p class="text-xl font-bold text-gray-900 mt-2">$82.39</p>
+                  </div>
+                  <div class="stock-index p-4">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-700 font-medium">BNB</span>
+                      <span class="text-xs crypto-negative font-bold">-0.32%</span>
+                    </div>
+                    <p class="text-xl font-bold text-gray-900 mt-2">$612.85</p>
+                  </div>
+                </div>
+                <div class="p-5 rounded-xl bg-green-50">
+                  <p class="text-sm text-gray-700 mb-3">📊 市场概览</p>
+                  <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-700">总市值</span>
+                      <span class="font-medium">$2.51T <span class="crypto-positive text-xs">+0.08%</span></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-700">24h 成交量</span>
+                      <span class="font-medium">$87.3B</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-700">BTC dominance</span>
+                      <span class="font-medium">53.1%</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-700">恐惧贪婪指数</span>
+                      <span class="font-medium text-amber-600">72 (贪婪)</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-5 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                  <p class="text-sm text-emerald-700">💡 特朗普"战情室密会"帖文引爆市场，比特币一度突破$74,455；ETH收复$2,000关口，SOL触及$83.10</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- A-Stock Result Card -->
+          <div class="result-card nature-card overflow-hidden" data-task="astock">
+            <div class="p-6 border-b border-green-100 cursor-pointer" onclick="toggleResult('astock')">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-rose-600"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-gray-900 text-lg">A股每日收盘总结</h3>
+                    <p class="text-sm text-gray-700">今天 15:10 执行成功 · 数据来源: 东方财富/新浪财经</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1.5 rounded-full text-sm bg-green-100 text-green-700 font-medium">✓ 成功</span>
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-700 transition-transform" id="astock-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="result-content" id="astock-content">
+              <div class="p-6">
+                <div class="grid grid-cols-3 gap-4 mb-5">
+                  <div class="stock-index p-4 text-center">
+                    <p class="text-xs text-gray-700 mb-1">上证指数</p>
+                    <p class="text-xl font-bold crypto-negative">4,068.57</p>
+                    <p class="text-xs crypto-negative font-medium mt-1">-0.73%</p>
+                  </div>
+                  <div class="stock-index p-4 text-center">
+                    <p class="text-xs text-gray-700 mb-1">深证成指</p>
+                    <p class="text-xl font-bold crypto-negative">15,575.13</p>
+                    <p class="text-xs crypto-negative font-medium mt-1">-1.81%</p>
+                  </div>
+                  <div class="stock-index p-4 text-center">
+                    <p class="text-xs text-gray-700 mb-1">创业板指</p>
+                    <p class="text-xl font-bold crypto-negative">4,037.95</p>
+                    <p class="text-xs crypto-negative font-medium mt-1">-2.11%</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-5">
+                  <div class="p-4 rounded-xl bg-green-50">
+                    <p class="text-sm text-gray-700 mb-3">📈 涨跌分布</p>
+                    <div class="flex items-center gap-3">
+                      <div class="flex-1 h-3 rounded-full bg-emerald-100 overflow-hidden">
+                        <div class="h-full bg-emerald-500 rounded-full" style="width: 21%"></div>
+                      </div>
+                      <span class="text-sm font-medium">1,116</span>
+                    </div>
+                    <div class="flex items-center gap-3 mt-2">
+                      <div class="flex-1 h-3 rounded-full bg-rose-100 overflow-hidden">
+                        <div class="h-full bg-rose-500 rounded-full" style="width: 79%"></div>
+                      </div>
+                      <span class="text-sm font-medium">4,163</span>
+                    </div>
+                  </div>
+                  <div class="p-4 rounded-xl bg-green-50">
+                    <p class="text-sm text-gray-700 mb-3">🎯 涨跌停</p>
+                    <div class="flex justify-around">
+                      <div class="text-center">
+                        <p class="text-2xl font-bold text-emerald-600">53</p>
+                        <p class="text-xs text-gray-700">涨停</p>
+                      </div>
+                      <div class="text-center">
+                        <p class="text-2xl font-bold text-rose-600">18</p>
+                        <p class="text-xs text-gray-700">跌停</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-4 rounded-xl bg-green-50 mb-4">
+                  <p class="text-sm text-gray-700 mb-2">💰 两市成交额</p>
+                  <p class="text-2xl font-bold text-gray-900">3.32 万亿</p>
+                  <p class="text-xs text-gray-700 mt-1">沪市 1.53万亿 · 深市 1.79万亿</p>
+                </div>
+                <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
+                  <p class="text-sm text-rose-700">📉 三大指数集体收跌，超4100只个股飘绿；养殖、创新药板块逆势活跃；5月沪指、创业板指月线累涨超2%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Task Schedule Section -->
+      <section class="module-enter" style="animation-delay: 0.3s">
+        <div class="nature-card overflow-hidden">
+          <div class="px-6 py-5 border-b border-green-100 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                <i data-lucide="calendar-clock" class="w-5 h-5 text-green-600"></i>
+              </div>
+              <h2 class="text-xl font-bold text-gray-900">任务调度配置</h2>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="openWebhookSettings()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-green-200 text-green-700 text-sm font-medium hover:bg-green-50 transition-colors" title="配置 Webhook 同步到 SOLO">
+                <i data-lucide="webhook" class="w-4 h-4"></i>
+                <span>Webhook 设置</span>
+              </button>
+              <button onclick="openAddTaskModal()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-nature text-sm font-medium">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>添加任务</span>
+              </button>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="space-y-3" id="tasksList">
+              <!-- Tasks will be rendered here -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Update current time
+    function updateTime() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('currentTime').textContent = timeStr;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Cron tasks data
+    const cronTasks = [
+      {
+        id: 1,
+        name: '深圳每日天气预报',
+        schedule: '0 8 * * *',
+        description: '每天早上 8:00 获取深圳天气预报',
+        lastRun: '今天 08:00',
+        nextRun: '明天 08:00',
+        status: 'success',
+        enabled: true
+      },
+      {
+        id: 2,
+        name: '科学日报',
+        schedule: '0 10 * * *',
+        description: '每天上午 10:00 生成科学日报',
+        lastRun: '今天 10:00',
+        nextRun: '明天 10:00',
+        status: 'success',
+        enabled: true
+      },
+      {
+        id: 3,
+        name: '加密货币每日早报',
+        schedule: '0 9 * * *',
+        description: '每天早上 9:00 总结加密货币市场',
+        lastRun: '今天 09:00',
+        nextRun: '明天 09:00',
+        status: 'success',
+        enabled: true
+      },
+      {
+        id: 4,
+        name: 'A股每日收盘总结',
+        schedule: '10 15 * * MON-FRI',
+        description: '工作日 15:10 总结 A 股市场',
+        lastRun: '今天 15:10',
+        nextRun: '周一 15:10',
+        status: 'success',
+        enabled: true
+      },
+      {
+        id: 5,
+        name: '盯网站更新',
+        schedule: '0 10,22 * * *',
+        description: '每天 10:00 和 22:00 扫描 https://www.pbccrc.org.cn ，抓取更新内容显示标题和摘要',
+        lastRun: '-',
+        nextRun: '今天 22:00',
+        status: 'pending',
+        enabled: true
+      }
+    ];
+
+    // Render tasks
+    function renderTasks() {
+      const container = document.getElementById('tasksList');
+      container.innerHTML = cronTasks.map(task => `
+        <div class="flex items-center justify-between p-5 rounded-xl bg-green-50/50 border border-green-100 hover:border-green-200 transition-all">
+          <div class="flex items-center gap-4">
+            <div class="w-3 h-3 rounded-full ${task.enabled ? 'bg-green-500' : 'bg-gray-300'}"></div>
+            <div>
+              <h4 class="font-bold text-gray-700">${task.name}</h4>
+              <p class="text-xs text-gray-700">${task.description}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="cron-expression px-4 py-2 rounded-lg font-mono text-sm">
+              ${task.schedule}
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-gray-700">下次执行</p>
+              <p class="text-sm font-mono text-gray-700">${task.nextRun}</p>
+            </div>
+            <button onclick="toggleTask(${task.id})" class="p-2.5 rounded-xl hover:bg-green-100 transition-colors">
+              <i data-lucide="${task.enabled ? 'pause' : 'play'}" class="w-4 h-4 text-gray-700"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    // Toggle task
+    function toggleTask(id) {
+      const task = cronTasks.find(t => t.id === id);
+      if (task) {
+        task.enabled = !task.enabled;
+        renderTasks();
+      }
+    }
+
+    // Toggle result content
+    function toggleResult(taskId) {
+      const content = document.getElementById(taskId + '-content');
+      const icon = document.getElementById(taskId + '-icon');
+      
+      content.classList.toggle('expanded');
+      if (content.classList.contains('expanded')) {
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Expand all results
+    function expandAllResults() {
+      ['weather', 'science', 'crypto', 'astock', 'webmonitor'].forEach(id => {
+        document.getElementById(id + '-content').classList.add('expanded');
+        document.getElementById(id + '-icon').style.transform = 'rotate(180deg)';
+      });
+    }
+
+    // Collapse all results
+    function collapseAllResults() {
+      ['weather', 'science', 'crypto', 'astock'].forEach(id => {
+        document.getElementById(id + '-content').classList.remove('expanded');
+        document.getElementById(id + '-icon').style.transform = 'rotate(0deg)';
+      });
+    }
+
+    // Initialize
+    renderTasks();
+    
+    // Auto-expand all results on load
+    setTimeout(() => {
+      ['weather', 'science', 'crypto', 'astock'].forEach(id => {
+        toggleResult(id);
+      });
+    }, 300);
+    
+    // Modal functions
+    function openAddTaskModal() {
+      const modal = document.getElementById('addTaskModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeAddTaskModal() {
+      const modal = document.getElementById('addTaskModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+    
+    function submitTask(event) {
+      event.preventDefault();
+      
+      const name = document.getElementById('taskName').value;
+      const schedule = document.getElementById('taskSchedule').value;
+      const description = document.getElementById('taskDescription').value;
+      const webhookUrl = localStorage.getItem('webhookUrl') || '';
+      
+      if (!name || !schedule) {
+        alert('请填写任务名称和调度时间');
+        return;
+      }
+      
+      // Add new task to the list
+      const newTask = {
+        id: cronTasks.length + 1,
+        name: name,
+        schedule: schedule,
+        description: description || '自定义定时任务',
+        lastRun: '-',
+        nextRun: '待计算',
+        status: 'pending',
+        enabled: true
+      };
+      
+      cronTasks.push(newTask);
+      renderTasks();
+      closeAddTaskModal();
+      
+      // Reset form
+      document.getElementById('taskForm').reset();
+      
+      // Send webhook if configured
+      if (webhookUrl) {
+        sendWebhook(webhookUrl, newTask);
+        showToast('任务创建成功！已同步到 SOLO');
+      } else {
+        showToast('任务创建成功！未配置 Webhook，未同步');
+      }
+    }
+    
+    function sendWebhook(url, task) {
+      const payload = {
+        action: 'create_scheduled_task',
+        task: {
+          name: task.name,
+          cron_expression: task.schedule,
+          description: task.description,
+          message: `执行定时任务「${task.name}」：${task.description}。调度时间：${task.schedule}`
+        },
+        timestamp: new Date().toISOString()
+      };
+      
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        mode: 'no-cors'
+      }).catch(err => {
+        console.error('Webhook 发送失败:', err);
+      });
+    }
+    
+    function openWebhookSettings() {
+      const currentUrl = localStorage.getItem('webhookUrl') || '';
+      const newUrl = prompt('请输入 Webhook URL（用于同步任务到 SOLO）：', currentUrl);
+      if (newUrl !== null) {
+        localStorage.setItem('webhookUrl', newUrl);
+        showToast(newUrl ? 'Webhook URL 已保存' : 'Webhook URL 已清除');
+      }
+    }
+    
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl bg-green-600 text-white font-medium shadow-lg z-50 animate-fade-in';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+  </script>
+  
+  <!-- Add Task Modal -->
+  <div id="addTaskModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAddTaskModal()"></div>
+    
+    <!-- Modal Content -->
+    <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden animate-modal-in">
+      <!-- Header -->
+      <div class="px-6 py-5 border-b border-green-100 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center">
+              <i data-lucide="plus" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">创建定时任务</h3>
+              <p class="text-sm text-gray-500">设置自动执行的任务调度</p>
+            </div>
+          </div>
+          <button onclick="closeAddTaskModal()" class="p-2 rounded-lg hover:bg-green-100 transition-colors">
+            <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Form -->
+      <form id="taskForm" onsubmit="submitTask(event)" class="p-6 space-y-5">
+        <!-- Task Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            任务名称 <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="taskName" placeholder="例如：每日数据备份" 
+            class="w-full px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-gray-900">
+        </div>
+        
+        <!-- Schedule -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            调度时间 <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <select id="scheduleHour" class="px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 outline-none text-gray-900" onchange="updateCronExpression()">
+              <option value="0">00:00</option>
+              <option value="1">01:00</option>
+              <option value="2">02:00</option>
+              <option value="3">03:00</option>
+              <option value="4">04:00</option>
+              <option value="5">05:00</option>
+              <option value="6">06:00</option>
+              <option value="7">07:00</option>
+              <option value="8" selected>08:00</option>
+              <option value="9">09:00</option>
+              <option value="10">10:00</option>
+              <option value="11">11:00</option>
+              <option value="12">12:00</option>
+              <option value="13">13:00</option>
+              <option value="14">14:00</option>
+              <option value="15">15:00</option>
+              <option value="16">16:00</option>
+              <option value="17">17:00</option>
+              <option value="18">18:00</option>
+              <option value="19">19:00</option>
+              <option value="20">20:00</option>
+              <option value="21">21:00</option>
+              <option value="22">22:00</option>
+              <option value="23">23:00</option>
+            </select>
+            <select id="scheduleFreq" class="px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 outline-none text-gray-900" onchange="updateCronExpression()">
+              <option value="daily">每天</option>
+              <option value="weekdays">工作日</option>
+              <option value="weekly">每周一</option>
+              <option value="monthly">每月1日</option>
+            </select>
+          </div>
+          <input type="text" id="taskSchedule" readonly
+            class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 font-mono text-sm text-gray-700">
+        </div>
+        
+        <!-- Description -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            任务描述
+          </label>
+          <textarea id="taskDescription" rows="2" placeholder="描述这个任务的作用..."
+            class="w-full px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-gray-900 resize-none"></textarea>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeAddTaskModal()" 
+            class="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+            取消
+          </button>
+          <button type="submit" 
+            class="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-500/25">
+            创建任务
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <style>
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    
+    .animate-modal-in {
+      animation: modalIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+  </style>
+  
+  <script>
+    // Initialize cron expression
+    function updateCronExpression() {
+      const hour = document.getElementById('scheduleHour').value;
+      const freq = document.getElementById('scheduleFreq').value;
+      
+      let cron = '';
+      switch(freq) {
+        case 'daily':
+          cron = `0 ${hour} * * *`;
+          break;
+        case 'weekdays':
+          cron = `0 ${hour} * * 1-5`;
+          break;
+        case 'weekly':
+          cron = `0 ${hour} * * 1`;
+          break;
+        case 'monthly':
+          cron = `0 ${hour} 1 * *`;
+          break;
+      }
+      
+      document.getElementById('taskSchedule').value = cron;
+    }
+    
+    // Initialize on load
+    updateCronExpression();
+  </script>
+</body>
+</html>
