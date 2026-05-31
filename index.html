@@ -994,6 +994,39 @@
               </div>
             </div>
           </div>
+
+          <!-- Daily Summary Result Card -->
+          <div class="result-card nature-card overflow-hidden" data-task="dailysummary">
+            <div class="p-6 border-b border-green-100 cursor-pointer" onclick="toggleResult('dailysummary')">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-2xl bg-purple-100 flex items-center justify-center">
+                    <i data-lucide="file-text" class="w-6 h-6 text-purple-600"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-gray-900 text-lg">每日变更摘要</h3>
+                    <p class="text-sm text-gray-700">每天 18:00 汇总当日所有任务变更</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1.5 rounded-full text-sm bg-amber-100 text-amber-700 font-medium">⏳ 等待执行</span>
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-700 transition-transform" id="dailysummary-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="result-content" id="dailysummary-content">
+              <div class="p-6">
+                <div class="text-center py-8">
+                  <div class="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="clock" class="w-8 h-8 text-purple-400"></i>
+                  </div>
+                  <p class="text-gray-700 font-medium">暂无摘要内容</p>
+                  <p class="text-sm text-gray-500 mt-2">下次生成时间：今天 18:00</p>
+                  <p class="text-xs text-gray-400 mt-1">将自动汇总天气、科学日报、加密货币、A股、网站监控等变更</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1158,7 +1191,7 @@
 
     // Expand all results
     function expandAllResults() {
-      ['weather', 'science', 'crypto', 'astock', 'webmonitor'].forEach(id => {
+      ['weather', 'science', 'crypto', 'astock', 'webmonitor', 'dailysummary'].forEach(id => {
         document.getElementById(id + '-content').classList.add('expanded');
         document.getElementById(id + '-icon').style.transform = 'rotate(180deg)';
       });
