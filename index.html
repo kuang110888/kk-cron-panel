@@ -30,6 +30,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <style>
     :root {
       /* 自然生态风配色 */
@@ -528,11 +532,33 @@
             <span class="text-sm text-green-700 font-medium">系统正常</span>
           </div>
           <div class="text-sm text-gray-700 font-mono" id="currentTime"></div>
+          <!-- 用户认证按钮 -->
+          <div id="authArea">
+            <button onclick="openAuthModal()" class="flex items-center gap-2 px-4 py-2 rounded-xl btn-nature text-sm font-medium transition-all">
+              <i data-lucide="log-in" class="w-4 h-4"></i>
+              <span>登录 / 注册</span>
+            </button>
+          </div>
+          <div id="userArea" class="hidden flex items-center gap-3">
+            <button onclick="navigateTo('dashboard')" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-green-200 text-green-700 text-sm font-medium hover:bg-green-50 transition-all">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+              <span>我的面板</span>
+            </button>
+            <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-50 border border-green-200">
+              <i data-lucide="user" class="w-4 h-4 text-green-600"></i>
+              <span class="text-sm text-green-700 font-medium" id="headerUsername"></span>
+            </div>
+            <button onclick="logoutUser()" class="p-2 rounded-xl hover:bg-red-50 transition-colors" title="退出登录">
+              <i data-lucide="log-out" class="w-4 h-4 text-red-500"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </header>
 
+  <!-- 主站视图（管理员面板） -->
+  <div id="view-home">
   <!-- Main Content -->
   <main class="pt-28 pb-12 px-6">
     <div class="max-w-7xl mx-auto">
@@ -1060,6 +1086,115 @@
       </section>
     </div>
   </main>
+  </div><!-- end view-home -->
+
+  <!-- 用户仪表盘视图 -->
+  <div id="view-dashboard" class="hidden">
+    <main class="pt-28 pb-12 px-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center leaf-glow">
+              <i data-lucide="layout-dashboard" class="w-6 h-6 text-white"></i>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-gray-900 section-title">我的任务面板</h2>
+              <p class="text-sm text-gray-700 mt-1">管理你的定时任务 · 你的专属链接：<a id="userShareLink" href="#" class="text-green-600 hover:underline font-medium"></a></p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="openTemplateModal()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-green-200 text-green-700 text-sm font-medium hover:bg-green-50 transition-all">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span>从模板添加</span>
+            </button>
+            <button onclick="openUserAddTaskModal()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-nature text-sm font-medium">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>添加任务</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 用户任务统计 -->
+        <section class="mb-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="nature-card p-6">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-700 text-sm font-medium">我的任务数</span>
+                <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                  <i data-lucide="list" class="w-5 h-5 text-green-600"></i>
+                </div>
+              </div>
+              <p class="text-4xl font-bold text-gray-900" id="userTaskCount">0</p>
+              <p class="text-sm text-gray-700 mt-2">🌿 定时任务</p>
+            </div>
+            <div class="nature-card p-6">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-700 text-sm font-medium">已启用</span>
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                  <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+              </div>
+              <p class="text-4xl font-bold text-emerald-600" id="userEnabledCount">0</p>
+              <p class="text-sm text-gray-700 mt-2">✨ 运行中</p>
+            </div>
+            <div class="nature-card p-6">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-700 text-sm font-medium">我的链接</span>
+                <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                  <i data-lucide="link" class="w-5 h-5 text-amber-600"></i>
+                </div>
+              </div>
+              <p class="text-lg font-bold text-amber-600 font-mono truncate" id="userLinkDisplay">-</p>
+              <p class="text-sm text-gray-700 mt-2">🔗 分享给朋友</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 用户任务列表 -->
+        <section>
+          <div class="nature-card overflow-hidden">
+            <div class="px-6 py-5 border-b border-green-100 flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                <i data-lucide="calendar-clock" class="w-5 h-5 text-green-600"></i>
+              </div>
+              <h2 class="text-xl font-bold text-gray-900">我的任务列表</h2>
+            </div>
+            <div class="p-6">
+              <div id="userTasksList" class="space-y-3">
+                <div class="text-center py-12 text-gray-500">
+                  <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+                  <p>还没有任务，点击上方按钮添加</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div><!-- end view-dashboard -->
+
+  <!-- 用户公开面板视图 -->
+  <div id="view-user" class="hidden">
+    <main class="pt-28 pb-12 px-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center leaf-glow">
+            <i data-lucide="user" class="w-6 h-6 text-white"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 section-title" id="publicUserTitle">用户面板</h2>
+            <p class="text-sm text-gray-700 mt-1" id="publicUserSubtitle">定时任务展示</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="publicTasksContainer">
+          <div class="text-center py-12 col-span-2 text-gray-500">
+            <i data-lucide="loader" class="w-8 h-8 mx-auto mb-3 animate-spin text-gray-300"></i>
+            <p>加载中...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div><!-- end view-user -->
 
   <script>
     // Initialize Lucide icons
@@ -1417,6 +1552,168 @@
     </div>
   </div>
   
+  <!-- 登录/注册模态框 -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAuthModal()"></div>
+    <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-modal-in">
+      <div class="px-6 py-5 border-b border-green-100 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center">
+              <i data-lucide="leaf" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900" id="authModalTitle">登录</h3>
+              <p class="text-sm text-gray-500" id="authModalSubtitle">欢迎回来</p>
+            </div>
+          </div>
+          <button onclick="closeAuthModal()" class="p-2 rounded-lg hover:bg-green-100 transition-colors">
+            <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+          </button>
+        </div>
+      </div>
+      <form id="authForm" onsubmit="handleAuth(event)" class="p-6 space-y-5">
+        <!-- 注册时显示的用户名字段 -->
+        <div id="usernameField" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-2">用户名 <span class="text-red-500">*</span></label>
+          <input type="text" id="authUsername" placeholder="设置你的用户名（用于生成个人链接）"
+            class="w-full px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-gray-900">
+          <p class="text-xs text-gray-400 mt-1">用户名将用于生成你的专属面板链接</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">邮箱 <span class="text-red-500">*</span></label>
+          <input type="email" id="authEmail" placeholder="your@email.com" required
+            class="w-full px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-gray-900">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">密码 <span class="text-red-500">*</span></label>
+          <input type="password" id="authPassword" placeholder="至少6位" required minlength="6"
+            class="w-full px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-gray-900">
+        </div>
+        <div id="authError" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600"></div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeAuthModal()"
+            class="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+            取消
+          </button>
+          <button type="submit" id="authSubmitBtn"
+            class="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-500/25">
+            登录
+          </button>
+        </div>
+        <div class="text-center">
+          <button type="button" onclick="toggleAuthMode()" class="text-sm text-green-600 hover:underline">
+            <span id="authToggleText">还没有账号？点击注册</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 模板任务模态框 -->
+  <div id="templateModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeTemplateModal()"></div>
+    <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-modal-in max-h-[80vh] flex flex-col">
+      <div class="px-6 py-5 border-b border-green-100 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center">
+              <i data-lucide="copy" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">从模板添加任务</h3>
+              <p class="text-sm text-gray-500">选择预设模板快速创建任务</p>
+            </div>
+          </div>
+          <button onclick="closeTemplateModal()" class="p-2 rounded-lg hover:bg-green-100 transition-colors">
+            <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+          </button>
+        </div>
+      </div>
+      <div class="p-6 overflow-y-auto" id="templateList">
+        <!-- 模板列表动态渲染 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 用户添加/编辑任务模态框 -->
+  <div id="userTaskModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeUserTaskModal()"></div>
+    <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden animate-modal-in">
+      <div class="px-6 py-5 border-b border-green-100 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center">
+              <i data-lucide="plus" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900" id="userTaskModalTitle">创建定时任务</h3>
+              <p class="text-sm text-gray-500">设置自动执行的任务调度</p>
+            </div>
+          </div>
+          <button onclick="closeUserTaskModal()" class="p-2 rounded-lg hover:bg-green-100 transition-colors">
+            <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+          </button>
+        </div>
+      </div>
+      <form id="userTaskForm" onsubmit="handleUserTaskSubmit(event)" class="p-6 space-y-5">
+        <input type="hidden" id="editTaskId" value="">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">任务名称 <span class="text-red-500">*</span></label>
+          <input type="text" id="userTaskName" placeholder="例如：每日数据备份" required
+            class="w-full px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-gray-900">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">调度时间 <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <select id="userScheduleHour" class="px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 outline-none text-gray-900" onchange="updateUserCronExpression()">
+              <option value="0">00:00</option><option value="1">01:00</option><option value="2">02:00</option>
+              <option value="3">03:00</option><option value="4">04:00</option><option value="5">05:00</option>
+              <option value="6">06:00</option><option value="7">07:00</option><option value="8" selected>08:00</option>
+              <option value="9">09:00</option><option value="10">10:00</option><option value="11">11:00</option>
+              <option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option>
+              <option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option>
+              <option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option>
+              <option value="21">21:00</option><option value="22">22:00</option><option value="23">23:00</option>
+            </select>
+            <select id="userScheduleFreq" class="px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 outline-none text-gray-900" onchange="updateUserCronExpression()">
+              <option value="daily">每天</option><option value="weekdays">工作日</option>
+              <option value="weekly">每周一</option><option value="monthly">每月1日</option>
+            </select>
+          </div>
+          <input type="text" id="userTaskSchedule" readonly
+            class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 font-mono text-sm text-gray-700">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">任务描述</label>
+          <textarea id="userTaskDescription" rows="2" placeholder="描述这个任务的作用..."
+            class="w-full px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-gray-900 resize-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">任务类型</label>
+          <select id="userTaskType" class="w-full px-4 py-3 rounded-xl border border-green-200 focus:border-green-500 outline-none text-gray-900">
+            <option value="weather">天气预报</option>
+            <option value="news">新闻资讯</option>
+            <option value="crypto">加密货币</option>
+            <option value="stock">股票行情</option>
+            <option value="monitor">网站监控</option>
+            <option value="custom">自定义</option>
+          </select>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeUserTaskModal()"
+            class="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+            取消
+          </button>
+          <button type="submit"
+            class="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-500/25">
+            保存任务
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <style>
     @keyframes modalIn {
       from {
@@ -1470,6 +1767,650 @@
     
     // Initialize on load
     updateCronExpression();
+  </script>
+
+  <!-- ==================== Firebase 多用户系统 ==================== -->
+  <script>
+    // ===== Firebase 初始化 =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyBxqe5Y2TuHE5h3g3aL-nq9NNgcYlblzOM",
+      authDomain: "kk-cron-panel.firebaseapp.com",
+      projectId: "kk-cron-panel",
+      storageBucket: "kk-cron-panel.firebasestorage.app",
+      messagingSenderId: "831367418888",
+      appId: "1:831367418888:web:acc55f08330e064a4aadbd"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // ===== 全局状态 =====
+    let currentUser = null; // Firebase User 对象
+    let currentUserData = null; // Firestore user doc
+    let isRegisterMode = false;
+    let userTasks = []; // 当前用户的任务列表
+
+    // ===== 模板任务数据 =====
+    const templateTasks = [
+      { name: '深圳每日天气预报', schedule: '0 8 * * *', description: '每天早上 8:00 获取深圳天气预报', type: 'weather', config: { city: '深圳' } },
+      { name: '科学日报', schedule: '0 10 * * *', description: '每天上午 10:00 生成科学日报', type: 'news', config: { source: 'Science Daily' } },
+      { name: '加密货币每日早报', schedule: '0 9 * * *', description: '每天早上 9:00 总结加密货币市场', type: 'crypto', config: { coins: ['BTC', 'ETH', 'SOL'] } },
+      { name: 'A股每日收盘总结', schedule: '10 15 * * MON-FRI', description: '工作日 15:10 总结 A 股市场', type: 'stock', config: { indices: ['上证', '深证', '创业板'] } },
+      { name: '盯网站更新', schedule: '0 10,22 * * *', description: '每天 10:00 和 22:00 扫描目标网站', type: 'monitor', config: { url: 'https://example.com' } },
+      { name: '每日变更摘要', schedule: '28 15 * * *', description: '每天 15:28 汇总当日所有定时任务变更', type: 'custom', config: {} }
+    ];
+
+    // ===== 认证状态监听 =====
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        // 从 Firestore 获取用户数据
+        try {
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          if (userDoc.exists) {
+            currentUserData = userDoc.data();
+          } else {
+            // 如果 Firestore 中没有用户文档（可能通过其他方式注册），创建一个
+            const username = user.email.split('@')[0];
+            currentUserData = { username: username, email: user.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+            await db.collection('users').doc(user.uid).set(currentUserData);
+          }
+        } catch (e) {
+          console.error('获取用户数据失败:', e);
+          currentUserData = { username: user.email.split('@')[0], email: user.email };
+        }
+        updateAuthUI(true);
+        // 如果当前在 dashboard 视图，加载任务
+        if (getCurrentRoute() === 'dashboard') {
+          loadUserTasks();
+        }
+      } else {
+        currentUser = null;
+        currentUserData = null;
+        userTasks = [];
+        updateAuthUI(false);
+      }
+      lucide.createIcons();
+    });
+
+    // ===== 认证 UI 更新 =====
+    function updateAuthUI(loggedIn) {
+      const authArea = document.getElementById('authArea');
+      const userArea = document.getElementById('userArea');
+      if (loggedIn && currentUserData) {
+        authArea.classList.add('hidden');
+        userArea.classList.remove('hidden');
+        userArea.classList.add('flex');
+        document.getElementById('headerUsername').textContent = currentUserData.username;
+      } else {
+        authArea.classList.remove('hidden');
+        userArea.classList.add('hidden');
+        userArea.classList.remove('flex');
+      }
+      lucide.createIcons();
+    }
+
+    // ===== 登录/注册模态框 =====
+    function openAuthModal() {
+      isRegisterMode = false;
+      updateAuthModalUI();
+      document.getElementById('authModal').classList.remove('hidden');
+      document.getElementById('authModal').classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('authError').classList.add('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+      document.getElementById('authModal').classList.remove('flex');
+      document.body.style.overflow = '';
+      document.getElementById('authForm').reset();
+      document.getElementById('authError').classList.add('hidden');
+    }
+
+    function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      updateAuthModalUI();
+    }
+
+    function updateAuthModalUI() {
+      const title = document.getElementById('authModalTitle');
+      const subtitle = document.getElementById('authModalSubtitle');
+      const submitBtn = document.getElementById('authSubmitBtn');
+      const toggleText = document.getElementById('authToggleText');
+      const usernameField = document.getElementById('usernameField');
+
+      if (isRegisterMode) {
+        title.textContent = '注册账号';
+        subtitle.textContent = '创建你的专属面板';
+        submitBtn.textContent = '注册';
+        toggleText.textContent = '已有账号？点击登录';
+        usernameField.classList.remove('hidden');
+      } else {
+        title.textContent = '登录';
+        subtitle.textContent = '欢迎回来';
+        submitBtn.textContent = '登录';
+        toggleText.textContent = '还没有账号？点击注册';
+        usernameField.classList.add('hidden');
+      }
+    }
+
+    async function handleAuth(event) {
+      event.preventDefault();
+      const email = document.getElementById('authEmail').value;
+      const password = document.getElementById('authPassword').value;
+      const errorEl = document.getElementById('authError');
+      errorEl.classList.add('hidden');
+
+      try {
+        if (isRegisterMode) {
+          const username = document.getElementById('authUsername').value.trim();
+          if (!username) {
+            errorEl.textContent = '请输入用户名';
+            errorEl.classList.remove('hidden');
+            return;
+          }
+          if (username.length < 2 || username.length > 20) {
+            errorEl.textContent = '用户名长度需要在 2-20 个字符之间';
+            errorEl.classList.remove('hidden');
+            return;
+          }
+          // 检查用户名是否已被占用
+          const usernameQuery = await db.collection('users').where('username', '==', username).limit(1).get();
+          if (!usernameQuery.empty) {
+            errorEl.textContent = '该用户名已被占用，请换一个';
+            errorEl.classList.remove('hidden');
+            return;
+          }
+          // 注册
+          const credential = await auth.createUserWithEmailAndPassword(email, password);
+          // 创建用户文档
+          await db.collection('users').doc(credential.user.uid).set({
+            username: username,
+            email: email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          closeAuthModal();
+          showToast('注册成功！欢迎你，' + username);
+          navigateTo('dashboard');
+        } else {
+          // 登录
+          await auth.signInWithEmailAndPassword(email, password);
+          closeAuthModal();
+          showToast('登录成功！');
+        }
+      } catch (error) {
+        let msg = '操作失败，请稍后重试';
+        if (error.code === 'auth/email-already-in-use') msg = '该邮箱已被注册';
+        else if (error.code === 'auth/invalid-email') msg = '邮箱格式不正确';
+        else if (error.code === 'auth/weak-password') msg = '密码太弱，至少需要6位';
+        else if (error.code === 'auth/user-not-found') msg = '账号不存在';
+        else if (error.code === 'auth/wrong-password') msg = '密码错误';
+        else if (error.code === 'auth/invalid-credential') msg = '邮箱或密码错误';
+        else if (error.code === 'auth/too-many-requests') msg = '请求过于频繁，请稍后重试';
+        errorEl.textContent = msg;
+        errorEl.classList.remove('hidden');
+      }
+    }
+
+    function logoutUser() {
+      auth.signOut();
+      showToast('已退出登录');
+      navigateTo('home');
+    }
+
+    // ===== Hash 路由系统 =====
+    function getCurrentRoute() {
+      const hash = window.location.hash || '#/';
+      if (hash === '#/' || hash === '#' || hash === '') return 'home';
+      if (hash === '#/dashboard') return 'dashboard';
+      if (hash.startsWith('#/user/')) return 'user';
+      return 'home';
+    }
+
+    function getUsernameFromHash() {
+      const hash = window.location.hash || '';
+      const match = hash.match(/^#\/user\/(.+)$/);
+      return match ? match[1] : null;
+    }
+
+    function navigateTo(route, param) {
+      if (route === 'home') window.location.hash = '#/';
+      else if (route === 'dashboard') window.location.hash = '#/dashboard';
+      else if (route === 'user' && param) window.location.hash = '#/user/' + param;
+    }
+
+    function handleRoute() {
+      const route = getCurrentRoute();
+      const viewHome = document.getElementById('view-home');
+      const viewDashboard = document.getElementById('view-dashboard');
+      const viewUser = document.getElementById('view-user');
+
+      // 隐藏所有视图
+      viewHome.classList.add('hidden');
+      viewDashboard.classList.add('hidden');
+      viewUser.classList.add('hidden');
+
+      if (route === 'home') {
+        viewHome.classList.remove('hidden');
+        document.title = 'KK 的 Cron 面板';
+      } else if (route === 'dashboard') {
+        if (!currentUser) {
+          showToast('请先登录');
+          navigateTo('home');
+          openAuthModal();
+          return;
+        }
+        viewDashboard.classList.remove('hidden');
+        document.title = '我的面板 - KK Cron Panel';
+        loadUserTasks();
+        updateUserDashboardInfo();
+      } else if (route === 'user') {
+        const username = getUsernameFromHash();
+        if (username) {
+          viewUser.classList.remove('hidden');
+          document.title = username + ' 的面板 - KK Cron Panel';
+          loadPublicUserTasks(username);
+        } else {
+          navigateTo('home');
+        }
+      }
+      lucide.createIcons();
+    }
+
+    window.addEventListener('hashchange', handleRoute);
+
+    // ===== Firestore CRUD 操作 =====
+
+    // 加载当前用户的任务
+    async function loadUserTasks() {
+      if (!currentUser) return;
+      try {
+        const snapshot = await db.collection('users').doc(currentUser.uid).collection('tasks').orderBy('createdAt', 'desc').get();
+        userTasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderUserTasks();
+      } catch (e) {
+        console.error('加载任务失败:', e);
+      }
+    }
+
+    // 渲染用户任务列表
+    function renderUserTasks() {
+      const container = document.getElementById('userTasksList');
+      const countEl = document.getElementById('userTaskCount');
+      const enabledEl = document.getElementById('userEnabledCount');
+
+      if (userTasks.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-gray-500">
+            <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+            <p>还没有任务，点击上方按钮添加</p>
+          </div>`;
+        lucide.createIcons();
+      } else {
+        container.innerHTML = userTasks.map(task => `
+          <div class="flex items-center justify-between p-5 rounded-xl bg-green-50/50 border border-green-100 hover:border-green-200 transition-all">
+            <div class="flex items-center gap-4">
+              <div class="w-3 h-3 rounded-full ${task.enabled ? 'bg-green-500' : 'bg-gray-300'}"></div>
+              <div>
+                <h4 class="font-bold text-gray-700">${escapeHtml(task.name)}</h4>
+                <p class="text-xs text-gray-700">${escapeHtml(task.description || '')}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="tag-nature px-3 py-1 rounded-lg text-xs font-medium">${getTypeLabel(task.type || 'custom')}</span>
+              <div class="cron-expression px-4 py-2 rounded-lg font-mono text-sm">${escapeHtml(task.schedule)}</div>
+              <button onclick="toggleUserTask('${task.id}')" class="p-2.5 rounded-xl hover:bg-green-100 transition-colors" title="${task.enabled ? '暂停' : '启用'}">
+                <i data-lucide="${task.enabled ? 'pause' : 'play'}" class="w-4 h-4 text-gray-700"></i>
+              </button>
+              <button onclick="editUserTask('${task.id}')" class="p-2.5 rounded-xl hover:bg-blue-100 transition-colors" title="编辑">
+                <i data-lucide="pencil" class="w-4 h-4 text-blue-600"></i>
+              </button>
+              <button onclick="deleteUserTask('${task.id}')" class="p-2.5 rounded-xl hover:bg-red-100 transition-colors" title="删除">
+                <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+        lucide.createIcons();
+      }
+
+      countEl.textContent = userTasks.length;
+      enabledEl.textContent = userTasks.filter(t => t.enabled).length;
+    }
+
+    function getTypeLabel(type) {
+      const map = { weather: '天气预报', news: '新闻资讯', crypto: '加密货币', stock: '股票行情', monitor: '网站监控', custom: '自定义' };
+      return map[type] || '自定义';
+    }
+
+    function getTypeIcon(type) {
+      const map = { weather: 'cloud-sun', news: 'newspaper', crypto: 'bitcoin', stock: 'trending-up', monitor: 'globe', custom: 'zap' };
+      return map[type] || 'zap';
+    }
+
+    function getTypeColor(type) {
+      const map = { weather: 'sky', news: 'violet', crypto: 'amber', stock: 'rose', monitor: 'blue', custom: 'purple' };
+      return map[type] || 'purple';
+    }
+
+    // 更新仪表盘信息
+    function updateUserDashboardInfo() {
+      if (!currentUserData) return;
+      const username = currentUserData.username;
+      const link = window.location.origin + window.location.pathname + '#/user/' + username;
+      document.getElementById('userShareLink').href = link;
+      document.getElementById('userShareLink').textContent = link;
+      document.getElementById('userLinkDisplay').textContent = '#/user/' + username;
+    }
+
+    // 添加/编辑用户任务
+    function openUserAddTaskModal() {
+      document.getElementById('editTaskId').value = '';
+      document.getElementById('userTaskModalTitle').textContent = '创建定时任务';
+      document.getElementById('userTaskForm').reset();
+      document.getElementById('userScheduleHour').value = '8';
+      document.getElementById('userScheduleFreq').value = 'daily';
+      updateUserCronExpression();
+      document.getElementById('userTaskModal').classList.remove('hidden');
+      document.getElementById('userTaskModal').classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeUserTaskModal() {
+      document.getElementById('userTaskModal').classList.add('hidden');
+      document.getElementById('userTaskModal').classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    async function handleUserTaskSubmit(event) {
+      event.preventDefault();
+      if (!currentUser) return;
+
+      const editId = document.getElementById('editTaskId').value;
+      const name = document.getElementById('userTaskName').value.trim();
+      const schedule = document.getElementById('userTaskSchedule').value;
+      const description = document.getElementById('userTaskDescription').value.trim();
+      const type = document.getElementById('userTaskType').value;
+
+      if (!name || !schedule) {
+        showToast('请填写任务名称和调度时间');
+        return;
+      }
+
+      const taskData = {
+        name: name,
+        schedule: schedule,
+        description: description || '自定义定时任务',
+        type: type,
+        enabled: true,
+        config: {}
+      };
+
+      try {
+        if (editId) {
+          // 编辑模式
+          await db.collection('users').doc(currentUser.uid).collection('tasks').doc(editId).update(taskData);
+          showToast('任务已更新');
+        } else {
+          // 新建模式
+          taskData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await db.collection('users').doc(currentUser.uid).collection('tasks').add(taskData);
+          showToast('任务创建成功！');
+        }
+        closeUserTaskModal();
+        loadUserTasks();
+      } catch (e) {
+        console.error('保存任务失败:', e);
+        showToast('保存失败，请稍后重试');
+      }
+    }
+
+    async function editUserTask(taskId) {
+      const task = userTasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      document.getElementById('editTaskId').value = taskId;
+      document.getElementById('userTaskModalTitle').textContent = '编辑定时任务';
+      document.getElementById('userTaskName').value = task.name;
+      document.getElementById('userTaskDescription').value = task.description || '';
+      document.getElementById('userTaskType').value = task.type || 'custom';
+
+      // 解析 cron 表达式设置下拉框
+      const parts = task.schedule.split(' ');
+      const hour = parseInt(parts[1]) || 8;
+      document.getElementById('userScheduleHour').value = hour;
+
+      let freq = 'daily';
+      if (parts[4] === '1-5') freq = 'weekdays';
+      else if (parts[4] === '1') freq = 'weekly';
+      else if (parts[2] !== '*') freq = 'monthly';
+      document.getElementById('userScheduleFreq').value = freq;
+      updateUserCronExpression();
+
+      document.getElementById('userTaskModal').classList.remove('hidden');
+      document.getElementById('userTaskModal').classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    async function toggleUserTask(taskId) {
+      const task = userTasks.find(t => t.id === taskId);
+      if (!task) return;
+      try {
+        await db.collection('users').doc(currentUser.uid).collection('tasks').doc(taskId).update({
+          enabled: !task.enabled
+        });
+        task.enabled = !task.enabled;
+        renderUserTasks();
+      } catch (e) {
+        console.error('更新任务状态失败:', e);
+      }
+    }
+
+    async function deleteUserTask(taskId) {
+      if (!confirm('确定要删除这个任务吗？')) return;
+      try {
+        await db.collection('users').doc(currentUser.uid).collection('tasks').doc(taskId).delete();
+        userTasks = userTasks.filter(t => t.id !== taskId);
+        renderUserTasks();
+        showToast('任务已删除');
+      } catch (e) {
+        console.error('删除任务失败:', e);
+      }
+    }
+
+    // ===== 模板任务 =====
+    function openTemplateModal() {
+      renderTemplateList();
+      document.getElementById('templateModal').classList.remove('hidden');
+      document.getElementById('templateModal').classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTemplateModal() {
+      document.getElementById('templateModal').classList.add('hidden');
+      document.getElementById('templateModal').classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    function renderTemplateList() {
+      const container = document.getElementById('templateList');
+      container.innerHTML = templateTasks.map((tpl, idx) => `
+        <div class="p-5 rounded-xl bg-green-50/50 border border-green-100 hover:border-green-200 transition-all mb-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-${getTypeColor(tpl.type)}-100 flex items-center justify-center">
+                <i data-lucide="${getTypeIcon(tpl.type)}" class="w-5 h-5 text-${getTypeColor(tpl.type)}-600"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-gray-700">${escapeHtml(tpl.name)}</h4>
+                <p class="text-xs text-gray-700">${escapeHtml(tpl.description)}</p>
+                <p class="text-xs font-mono text-gray-500 mt-1">${escapeHtml(tpl.schedule)}</p>
+              </div>
+            </div>
+            <button onclick="copyTemplateToUser(${idx})" class="flex items-center gap-2 px-4 py-2 rounded-xl btn-nature text-sm font-medium">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span>复制</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    async function copyTemplateToUser(templateIdx) {
+      if (!currentUser) return;
+      const tpl = templateTasks[templateIdx];
+      try {
+        await db.collection('users').doc(currentUser.uid).collection('tasks').add({
+          name: tpl.name,
+          schedule: tpl.schedule,
+          description: tpl.description,
+          type: tpl.type,
+          enabled: true,
+          config: tpl.config || {},
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('模板任务已添加');
+        loadUserTasks();
+        closeTemplateModal();
+      } catch (e) {
+        console.error('复制模板失败:', e);
+        showToast('添加失败，请稍后重试');
+      }
+    }
+
+    // ===== 公开用户面板 =====
+    async function loadPublicUserTasks(username) {
+      const container = document.getElementById('publicTasksContainer');
+      const titleEl = document.getElementById('publicUserTitle');
+      const subtitleEl = document.getElementById('publicUserSubtitle');
+
+      try {
+        // 通过 username 查找用户
+        const userQuery = await db.collection('users').where('username', '==', username).limit(1).get();
+        if (userQuery.empty) {
+          container.innerHTML = `
+            <div class="text-center py-12 col-span-2 text-gray-500">
+              <i data-lucide="user-x" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+              <p>未找到用户 "${escapeHtml(username)}"</p>
+            </div>`;
+          lucide.createIcons();
+          return;
+        }
+
+        const userDoc = userQuery.docs[0];
+        const userData = userDoc.data();
+        titleEl.textContent = userData.username + ' 的任务面板';
+        subtitleEl.textContent = userData.email ? '定时任务展示' : '定时任务展示';
+
+        // 获取该用户的任务
+        const tasksSnapshot = await db.collection('users').doc(userDoc.id).collection('tasks').where('enabled', '==', true).get();
+        const tasks = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        if (tasks.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-12 col-span-2 text-gray-500">
+              <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+              <p>该用户还没有公开的任务</p>
+            </div>`;
+          lucide.createIcons();
+          return;
+        }
+
+        container.innerHTML = tasks.map(task => {
+          const color = getTypeColor(task.type || 'custom');
+          const icon = getTypeIcon(task.type || 'custom');
+          return `
+            <div class="result-card nature-card overflow-hidden module-enter">
+              <div class="p-6 border-b border-green-100">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-${color}-100 flex items-center justify-center">
+                      <i data-lucide="${icon}" class="w-6 h-6 text-${color}-600"></i>
+                    </div>
+                    <div>
+                      <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(task.name)}</h3>
+                      <p class="text-sm text-gray-700">${escapeHtml(task.description || '')}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="tag-nature px-3 py-1.5 rounded-full text-sm">${getTypeLabel(task.type || 'custom')}</span>
+                    <span class="px-3 py-1.5 rounded-full text-sm bg-green-100 text-green-700 font-mono">${escapeHtml(task.schedule)}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="text-center py-6 text-gray-400">
+                  <i data-lucide="clock" class="w-8 h-8 mx-auto mb-2 text-gray-300"></i>
+                  <p class="text-sm">等待任务执行结果...</p>
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+        lucide.createIcons();
+      } catch (e) {
+        console.error('加载公开面板失败:', e);
+        container.innerHTML = `
+          <div class="text-center py-12 col-span-2 text-gray-500">
+            <i data-lucide="alert-circle" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+            <p>加载失败，请稍后重试</p>
+          </div>`;
+        lucide.createIcons();
+      }
+    }
+
+    // ===== 用户 Cron 表达式更新 =====
+    function updateUserCronExpression() {
+      const hour = document.getElementById('userScheduleHour').value;
+      const freq = document.getElementById('userScheduleFreq').value;
+      let cron = '';
+      switch(freq) {
+        case 'daily': cron = `0 ${hour} * * *`; break;
+        case 'weekdays': cron = `0 ${hour} * * 1-5`; break;
+        case 'weekly': cron = `0 ${hour} * * 1`; break;
+        case 'monthly': cron = `0 ${hour} 1 * *`; break;
+      }
+      document.getElementById('userTaskSchedule').value = cron;
+    }
+
+    // ===== 工具函数 =====
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ===== 初始化模板任务到 Firestore =====
+    async function initTemplates() {
+      try {
+        for (const tpl of templateTasks) {
+          const docRef = db.collection('templates').doc(tpl.name);
+          const doc = await docRef.get();
+          if (!doc.exists) {
+            await docRef.set({
+              name: tpl.name,
+              schedule: tpl.schedule,
+              description: tpl.description,
+              type: tpl.type,
+              config: tpl.config || {}
+            });
+          }
+        }
+        console.log('模板任务已同步');
+      } catch (e) {
+        console.error('初始化模板失败:', e);
+      }
+    }
+
+    // ===== 页面初始化 =====
+    window.addEventListener('DOMContentLoaded', () => {
+      // 初始化路由
+      handleRoute();
+      // 初始化模板
+      initTemplates();
+    });
   </script>
 </body>
 </html>
