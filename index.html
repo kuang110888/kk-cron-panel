@@ -546,7 +546,7 @@
                 <i data-lucide="list" class="w-5 h-5 text-green-600"></i>
               </div>
             </div>
-            <p class="text-4xl font-bold text-gray-900">5</p>
+            <p class="text-4xl font-bold text-gray-900">6</p>
             <p class="text-sm text-gray-700 mt-2">🌿 活跃定时任务</p>
           </div>
           <div class="nature-card p-6">
@@ -1090,6 +1090,16 @@
         description: '每天 10:00 和 22:00 扫描 https://www.pbccrc.org.cn ，抓取更新内容显示标题和摘要',
         lastRun: '-',
         nextRun: '今天 22:00',
+        status: 'pending',
+        enabled: true
+      },
+      {
+        id: 6,
+        name: '每日变更摘要',
+        schedule: '0 18 * * *',
+        description: '每天 18:00 汇总当日所有定时任务的变更内容，生成摘要报告',
+        lastRun: '-',
+        nextRun: '今天 18:00',
         status: 'pending',
         enabled: true
       }
