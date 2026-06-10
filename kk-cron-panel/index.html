@@ -1044,38 +1044,16 @@
               <div class="p-6">
                 <div class="space-y-4">
                   <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
-                    <p class="text-sm text-amber-700 font-medium">📅 覆盖日期范围：2026-06-08 至 2026-06-09</p>
+                    <p class="text-sm text-amber-700 font-medium">📅 覆盖日期范围：2026-06-09 至 2026-06-10</p>
                   </div>
 
-                  <!-- 重要合并 -->
+                  <!-- 变更摘要 -->
                   <div class="news-item p-4 rounded-xl">
                     <div class="flex items-start gap-3">
-                      <span class="px-3 py-1 rounded-lg text-xs bg-purple-100 text-purple-700 font-medium flex-shrink-0">🆕 重要合并</span>
+                      <span class="px-3 py-1 rounded-lg text-xs bg-emerald-100 text-emerald-700 font-medium flex-shrink-0">📋 变更概述</span>
                       <div>
-                        <p class="text-sm font-bold text-gray-700">CronHub 智能定时任务调度中心首次上线（commit 8764023）</p>
-                        <p class="text-xs text-gray-700 mt-2">新增一体化任务调度与结果展示平台，包含 6 个核心定时任务（天气、科学日报、加密货币行情、A股收盘、网站监控、变更摘要），采用自然生态风格 UI，集成 Firebase 认证与响应式移动端适配。</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 稳定性与可靠性 -->
-                  <div class="news-item p-4 rounded-xl">
-                    <div class="flex items-start gap-3">
-                      <span class="px-3 py-1 rounded-lg text-xs bg-emerald-100 text-emerald-700 font-medium flex-shrink-0">✅ 稳定性</span>
-                      <div>
-                        <p class="text-sm font-bold text-gray-700">前端静态页面稳定部署，实时数据展示正常</p>
-                        <p class="text-xs text-gray-700 mt-2">6 个任务卡片全部正常展示，交互（展开/收起、状态指示）可用；lucide 图标与 Tailwind CDN 加载无异常；无控制台报错。</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 安全与依赖 -->
-                  <div class="news-item p-4 rounded-xl">
-                    <div class="flex items-start gap-3">
-                      <span class="px-3 py-1 rounded-lg text-xs bg-amber-100 text-amber-700 font-medium flex-shrink-0">🔐 安全</span>
-                      <div>
-                        <p class="text-sm font-bold text-gray-700">引入 Firebase 认证与外部 CDN 依赖</p>
-                        <p class="text-xs text-gray-700 mt-2">依赖：firebase@10.12.2（compat 模式）、tailwindcss（CDN）、lucide 图标、Google Fonts；外部链接已添加 rel="noopener noreferrer" 与 target="_blank"；无硬编码密钥。</p>
+                        <p class="text-sm font-bold text-gray-700">过去 24 小时代码库无实质内容变更（commit 8d41600 为摘要更新自身）</p>
+                        <p class="text-xs text-gray-700 mt-2">CronHub 平台整体运行稳定，6 个定时任务卡片（天气、科学日报、加密货币行情、A 股收盘、网站监控、变更摘要）展示正常，无新功能引入或 Bug 修复提交。</p>
                       </div>
                     </div>
                   </div>
@@ -1084,14 +1062,13 @@
                   <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
                     <p class="text-sm font-bold text-rose-700 mb-2">⚠️ 需要关注</p>
                     <ul class="text-xs text-rose-700 space-y-1.5 list-disc list-inside">
-                      <li>当前所有任务数据为静态写入 HTML，未接入真实后端调度 — 数据刷新依赖手动更新页面内容</li>
-                      <li>Firebase 配置（auth/firestore）虽引入了 SDK，但尚未配置项目凭据，认证功能实际无法使用</li>
-                      <li>天气/加密货币/A股等外部数据源需确认有相应的后端定时任务定期抓取与注入</li>
-                      <li>建议：在后续迭代中接入真实 CronJob 调度器 + 后端 API，并补充单元测试覆盖</li>
+                      <li>任务卡片数据仍为静态硬编码，尚未接入真实后端定时调度器，需尽快打通自动抓取链路</li>
+                      <li>Firebase 认证 SDK 已引入但无项目凭据，认证相关按钮目前不可用</li>
+                      <li>缺少单元测试覆盖，建议在下一阶段补充核心交互与 API 层测试</li>
                     </ul>
                   </div>
 
-                  <p class="text-xs text-gray-400 text-center pt-2">本次变更基于 commit 8764023 · 共 1 个提交 · 2460 行新增</p>
+                  <p class="text-xs text-gray-400 text-center pt-2">基于 commit 8d41600 · 过去 24 小时共 1 个提交（摘要更新） · 代码行变动 ≈ 0</p>
                 </div>
               </div>
             </div>
