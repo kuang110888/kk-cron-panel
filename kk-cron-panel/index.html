@@ -1044,7 +1044,7 @@
               <div class="p-6">
                 <div class="space-y-4">
                   <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
-                    <p class="text-sm text-amber-700 font-medium">📅 覆盖日期范围：2026-06-10 至 2026-06-11</p>
+                    <p class="text-sm text-amber-700 font-medium">📅 覆盖日期范围：2026-06-11 至 2026-06-12</p>
                   </div>
 
                   <!-- 变更摘要 -->
@@ -1052,8 +1052,38 @@
                     <div class="flex items-start gap-3">
                       <span class="px-3 py-1 rounded-lg text-xs bg-emerald-100 text-emerald-700 font-medium flex-shrink-0">📋 变更概述</span>
                       <div>
-                        <p class="text-sm font-bold text-gray-700">过去 24 小时代码库无实质内容变更（commit a3fc0d4 为摘要更新自身）</p>
-                        <p class="text-xs text-gray-700 mt-2">CronHub 平台整体运行稳定，6 个定时任务卡片（天气、科学日报、加密货币行情、A 股收盘、网站监控、变更摘要）展示正常，无新功能引入或 Bug 修复提交。</p>
+                        <p class="text-sm font-bold text-gray-700">过去 24 小时内无重大变更记录</p>
+                        <p class="text-xs text-gray-700 mt-2">CronHub 代码库在本时段仅包含 1 条自动化摘要更新提交（commit d5cd4d1），无功能新增、无 Bug 修复、无依赖升级。6 个定时任务卡片（天气、科学日报、加密货币行情、A 股收盘、网站监控、变更摘要）展示正常，系统运行稳定。</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 重要合并 -->
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-green-100 text-green-700 font-medium flex-shrink-0">✨ 重要合并</span>
+                      <div>
+                        <p class="text-xs text-gray-700">无</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 稳定性与可靠性 -->
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-blue-100 text-blue-700 font-medium flex-shrink-0">🛡️ 稳定性</span>
+                      <div>
+                        <p class="text-xs text-gray-700">无 Bug 修复或事故相关补丁提交；前端卡片渲染与交互链路无异常。</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 安全与依赖 -->
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-indigo-100 text-indigo-700 font-medium flex-shrink-0">🔐 安全/依赖</span>
+                      <div>
+                        <p class="text-xs text-gray-700">无安全补丁或依赖升级；Firebase SDK（10.12.2）、Tailwind CDN、Lucide Icons 版本保持不变。</p>
                       </div>
                     </div>
                   </div>
@@ -1062,13 +1092,13 @@
                   <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
                     <p class="text-sm font-bold text-rose-700 mb-2">⚠️ 需要关注</p>
                     <ul class="text-xs text-rose-700 space-y-1.5 list-disc list-inside">
-                      <li>任务卡片数据仍为静态硬编码，尚未接入真实后端定时调度器，需尽快打通自动抓取链路</li>
-                      <li>Firebase 认证 SDK 已引入但无项目凭据配置，认证流程需完善</li>
+                      <li>任务卡片数据仍为静态硬编码，尚未接入真实后端定时调度器，需尽快打通自动抓取与数据更新链路</li>
+                      <li>Firebase 认证 SDK 已引入但无项目凭据配置，登录注册流程不可用，需完善</li>
                       <li>缺少单元测试覆盖，建议在下一阶段补充核心交互与 API 层测试</li>
                     </ul>
                   </div>
 
-                  <p class="text-xs text-gray-400 text-center pt-2">基于 commit a3fc0d4 · 过去 24 小时共 1 个提交（摘要更新） · 代码行变动 ≈ 0</p>
+                  <p class="text-xs text-gray-400 text-center pt-2">基于 commit d5cd4d1 · 过去 24 小时共 1 个提交（摘要更新） · 代码行变动 ≈ 0</p>
                 </div>
               </div>
             </div>
