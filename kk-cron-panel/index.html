@@ -1044,15 +1044,35 @@
               <div class="p-6">
                 <div class="space-y-4">
                   <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
-                    <p class="text-sm text-amber-700 font-medium">📅 覆盖日期范围：2026-06-24 至 2026-06-25</p>
+                    <p class="text-sm text-amber-700 font-medium">📅 覆盖日期范围：2026-06-25 至 2026-06-26</p>
                   </div>
 
                   <div class="news-item p-4 rounded-xl">
                     <div class="flex items-start gap-3">
-                      <span class="px-3 py-1 rounded-lg text-xs bg-gray-100 text-gray-600 font-medium flex-shrink-0">📭 无变更</span>
+                      <span class="px-3 py-1 rounded-lg text-xs bg-purple-100 text-purple-700 font-medium flex-shrink-0">🆕 重要合并</span>
                       <div>
-                        <p class="text-sm font-bold text-gray-700">过去 24 小时内无重大变更记录。</p>
-                        <p class="text-xs text-gray-500 mt-2">本时段内仓库无新增功能性提交，各业务任务卡片数据保持不变，系统平稳运行。</p>
+                        <p class="text-sm font-bold text-gray-700">CronHub 智能定时任务调度中心项目首次上线（commit b7eda39）</p>
+                        <p class="text-xs text-gray-500 mt-2">项目初始化提交，包含完整的自然生态风格前端页面：天气、科学日报、加密货币、A股、网站监控 5 个任务结果卡片，以及任务调度配置面板、Firebase 认证框架、用户仪表盘视图等基础架构。</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-blue-100 text-blue-700 font-medium flex-shrink-0">🛡️ 稳定性</span>
+                      <div>
+                        <p class="text-sm font-bold text-gray-700">部署脚本 deploy.sh 就绪，支持一键 Git 提交与推送</p>
+                        <p class="text-xs text-gray-500 mt-2">位于 kk-cron-panel/deploy.sh，包含变更检测、自动提交、远程推送等完整部署流程，为后续自动化调度提供基础设施。</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="news-item p-4 rounded-xl">
+                    <div class="flex items-start gap-3">
+                      <span class="px-3 py-1 rounded-lg text-xs bg-emerald-100 text-emerald-700 font-medium flex-shrink-0">🔐 安全与依赖</span>
+                      <div>
+                        <p class="text-sm font-bold text-gray-700">前端依赖全部走 CDN，Firebase SDK 版本锁定 10.12.2</p>
+                        <p class="text-xs text-gray-500 mt-2">使用 Tailwind CSS CDN、Lucide 图标、Google Fonts 等外部资源；Firebase 使用 compat 模式以兼容现有 API 设计。</p>
                       </div>
                     </div>
                   </div>
@@ -1060,13 +1080,13 @@
                   <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
                     <p class="text-sm font-bold text-rose-700 mb-2">⚠️ 需要关注</p>
                     <ul class="text-xs text-rose-700 space-y-1.5 list-disc list-inside">
-                      <li>业务数据卡片仍为静态硬编码，未接入真实定时调度器，自动抓取链路待打通</li>
-                      <li>Firebase 认证 SDK 已引入但无项目凭据，登录/注册 UI 链路暂不可用，需完善</li>
-                      <li>连续多日无代码变更，需确认上游数据源与自动化调度是否正常运转</li>
+                      <li>所有业务数据卡片均为静态硬编码，未接入真实数据源与定时调度器，自动抓取链路待打通</li>
+                      <li>Firebase 认证 SDK 已引入但未配置项目凭据，登录/注册 UI 链路暂不可用，需完善后端集成</li>
+                      <li>项目为首次上线，缺少单元测试与端到端测试覆盖，核心交互逻辑需验证回归</li>
                     </ul>
                   </div>
 
-                  <p class="text-xs text-gray-400 text-center pt-2">自动化摘要生成 · 过去 24 小时共 0 个提交 · 代码行变动 ≈ 0</p>
+                  <p class="text-xs text-gray-400 text-center pt-2">自动化摘要生成 · 过去 24 小时共 1 个提交 · 代码行变动 ≈ +5030</p>
                 </div>
               </div>
             </div>
