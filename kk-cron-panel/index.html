@@ -1044,49 +1044,16 @@
               <div class="p-6">
                 <div class="space-y-4">
                   <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
-                    <p class="text-sm text-amber-700 font-medium">📅 覆盖日期范围：2026-07-07 至 2026-07-08</p>
+                    <p class="text-sm text-amber-700 font-medium">📅 覆盖日期范围：2026-07-08 至 2026-07-09</p>
                   </div>
 
-                  <div class="news-item p-4 rounded-xl">
-                    <div class="flex items-start gap-3">
-                      <span class="px-3 py-1 rounded-lg text-xs bg-green-100 text-green-700 font-medium flex-shrink-0">🚀 里程碑</span>
-                      <div>
-                        <p class="text-sm font-bold text-gray-700">CronHub 项目初始搭建完成</p>
-                        <p class="text-xs text-gray-500 mt-2">提交 ecd461b：项目首次提交，包含完整单页应用（5,026 行新增），涵盖 6 大任务模块（天气预报、科学日报、加密货币早报、A股收盘总结、盯网站更新、每日变更摘要）、Firebase 多用户认证系统、任务 CRUD 及公开面板功能，同时新增 deploy.sh 自动部署脚本。</p>
-                      </div>
-                    </div>
+                  <div class="p-6 rounded-xl bg-gray-50 border border-gray-200 text-center">
+                    <i data-lucide="coffee" class="w-10 h-10 text-gray-400 mx-auto mb-3"></i>
+                    <p class="text-gray-600">过去 24 小时内无重大变更记录。</p>
+                    <p class="text-xs text-gray-400 mt-2">所有任务正常运行，系统状态稳定。</p>
                   </div>
 
-                  <div class="news-item p-4 rounded-xl">
-                    <div class="flex items-start gap-3">
-                      <span class="px-3 py-1 rounded-lg text-xs bg-blue-100 text-blue-700 font-medium flex-shrink-0">🔒 安全</span>
-                      <div>
-                        <p class="text-sm font-bold text-gray-700">Firebase 客户端 SDK 集成，API Key 暴露于前端代码</p>
-                        <p class="text-xs text-gray-500 mt-2">Firebase 配置（apiKey、appId 等）硬编码在 HTML 中，属于 Firestore 客户端模式的标准做法，但需确保 Firestore 安全规则已正确配置，防止未授权数据访问。</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="news-item p-4 rounded-xl">
-                    <div class="flex items-start gap-3">
-                      <span class="px-3 py-1 rounded-lg text-xs bg-amber-100 text-amber-700 font-medium flex-shrink-0">📦 依赖</span>
-                      <div>
-                        <p class="text-sm font-bold text-gray-700">外部 CDN 依赖引入：Tailwind CSS、Lucide Icons、Firebase SDK</p>
-                        <p class="text-xs text-gray-500 mt-2">项目依赖 cdn.tailwindcss.com、unpkg.com/lucide、gstatic.com/firebasejs 三个外部 CDN，无版本锁定机制，若 CDN 不可用将导致页面功能降级。</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 mt-4">
-                    <p class="text-sm text-rose-700 font-medium mb-2">⚠️ 需要关注</p>
-                    <ul class="text-xs text-gray-600 space-y-1">
-                      <li>• <b>Firestore 安全规则未验证</b>：Firebase 客户端直连 Firestore，需确认规则已限制仅认证用户可写、公开面板仅读 enabled=true 的任务</li>
-                      <li>• <b>deploy.sh 使用 git add -A</b>：可能误提交临时文件或敏感配置，建议改为按路径精确添加</li>
-                      <li>• <b>无自动化测试</b>：初始提交不含任何测试用例，核心业务逻辑（认证、CRUD、路由）缺乏回归保障</li>
-                    </ul>
-                  </div>
-
-                  <div class="p-4 rounded-xl bg-green-50 border border-green-200 mt-4">
+                  <div class="p-4 rounded-xl bg-green-50 border border-green-200">
                     <p class="text-sm text-green-700 font-medium mb-2">✅ 系统运行状态</p>
                     <ul class="text-xs text-gray-600 space-y-1">
                       <li>• 6 个定时任务全部正常调度</li>
@@ -1096,7 +1063,7 @@
                     </ul>
                   </div>
 
-                  <p class="text-xs text-gray-400 text-center pt-2">自动化摘要生成 · 过去 24 小时共 1 个提交</p>
+                  <p class="text-xs text-gray-400 text-center pt-2">自动化摘要生成 · 过去 24 小时共 1 个提交（常规更新）</p>
                 </div>
               </div>
             </div>
